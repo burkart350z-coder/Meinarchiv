@@ -28,11 +28,16 @@ function findDate(t){
   return ""
 }
 function findAmount(t){
+  // First priority: the amount the customer actually has to pay.
+  // Important for Concordia: "Rechnungstotal" can be 39.10 CHF,
+  // while "zu Ihren Lasten" is only 3.95 CHF.
+  let m=t.match(/zu\s+Ihren\s+Lasten\s*(?:CHF\s*)?([0-9' ]+[.,][0-9]{2})/i);
+  if(m){const n=amount(m[1]);if(n>0)return n}
+
+  // Then prefer explicit final invoice/payment totals.
   const patterns=[
-    // Galaxus / Swiss invoices: prefer final gross amount incl. VAT.
     /(?:Total\s*(?:inkl\.?\s*(?:MwSt\.?|Mehrwertsteuer)|gross|brutto)|Gesamtbetrag\s*inkl\.?\s*(?:MwSt\.?|Mehrwertsteuer)|zu\s+bezahlender\s+Gesamtbetrag|zu\s+bezahlender\s+Betrag|Totalbetrag|zu\s+bezahlen|Zahlbetrag)\s*(?:\([^)]*\))?\s*(?:in\s+CHF)?\s*:?[ ]*(?:CHF|SFr\.?|Fr\.)?\s*([0-9' ]+[.,][0-9]{2})/i,
     /(?:Rechnungsbetrag|Rechnungs\s*total|Total\s*Rechnung)\s*:?[ ]*(?:CHF|SFr\.?|Fr\.)?\s*([0-9' ]+[.,][0-9]{2})/i,
-    /zu\s+Ihren\s+Lasten\s*(?:CHF\s*)?([0-9' ]+[.,][0-9]{2})/i,
     /(?:CHF|SFr\.?|Fr\.)\s*([0-9' ]+[.,][0-9]{2})/i
   ];
   for(const p of patterns){const m=t.match(p),n=m&&amount(m[1]);if(n>0)return n}
