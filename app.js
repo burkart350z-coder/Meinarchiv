@@ -31,8 +31,8 @@ function isCreditCard(t){return /(kreditkarte|credit\s*card|kartenabrechnung|car
 function findCreditCardMinimum(t){
   if(!isCreditCard(t))return 0;
   for(const p of [
+    /Mindestbetrag\s+bei\s+Teilzahlung\s*,?\s*zahlbar\s+bis\s+\d{1,2}[.\-\/]\d{1,2}[.\-\/]20\d{2}\s*(?:CHF|SFr\.?|Fr\.)\s*([0-9' ]+[.,][0-9]{2})/i,
     /Mindestbetrag\s+bei\s+Teilzahlung\b[\s\S]{0,140}?(?:CHF|SFr\.?|Fr\.)\s*([0-9' ]+[.,][0-9]{2})/i,
-    /Mindestbetrag\s+bei\s+Teilzahlung\b[\s\S]{0,100}?([0-9' ]+[.,][0-9]{2})\s*$/im,
     /Mindestbetrag\s*:?\s*(?:CHF|SFr\.?|Fr\.)?\s*([0-9' ]+[.,][0-9]{2})/i,
     /Mindestzahlung\s*:?\s*(?:CHF|SFr\.?|Fr\.)?\s*([0-9' ]+[.,][0-9]{2})/i,
     /mindestens\s+zu\s+zahlen\s*:?\s*(?:CHF|SFr\.?|Fr\.)?\s*([0-9' ]+[.,][0-9]{2})/i,
