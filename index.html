@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#172033"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="styles.css"><title>MeinArchiv v18</title>
+<link rel="stylesheet" href="styles.css"><title>MeinArchiv v19</title>
 </head>
 <body>
-<header><h1>📁 MeinArchiv</h1><p>Dein persönliches Dokumenten- & Rechnungsarchiv · v18</p></header>
+<header><h1>📁 MeinArchiv</h1><p>Dein persönliches Dokumenten- & Rechnungsarchiv · v19</p></header>
 <main>
 <div class="card"><div class="stats"><div class="stat"><span class="muted">Offen</span><b id="openCount">0</b></div><div class="stat"><span class="muted">Offener Betrag</span><b id="openAmount">CHF 0.00</b></div><div class="stat"><span class="muted">Bald fällig</span><b id="soonCount">0</b></div></div></div>
-<div class="card"><h2>📚 Archiv</h2><div class="tabs"><button class="tab active" data-filter="open">🔴 Offen</button><button class="tab" data-filter="paid">✅ Erledigt</button><button class="tab" data-filter="all">📚 Alle</button></div></div>
+<div class="card"><h2>📚 Archiv</h2><div class="tabs"><button class="tab active" data-filter="open">🔴 Offen</button><button class="tab" data-filter="paid">🟢 Bezahlt</button><button class="tab" data-filter="all">📚 Alle</button></div></div>
 <div class="card"><h2>📥 Neues Dokument</h2><label>PDF oder Bild</label><input id="file" type="file" accept=".pdf,image/*"><div id="scan" class="scan" hidden>🧠 Dokument wird gelesen …</div><div id="status" class="muted">PDF-Text wird gelesen; Bilder werden per OCR analysiert.</div>
 <label>Absender</label><input id="name"><label>Betrag CHF</label><input id="amount" type="number" step=".01" inputmode="decimal">
 <div id="minimumWrap" hidden><label>💳 Mindestbetrag CHF</label><input id="minimum" type="number" step=".01" inputmode="decimal"></div>
@@ -21,7 +21,6 @@
 </main>
 <nav><button onclick="window.scrollTo({top:0,behavior:'smooth'})"><b>⌂</b>Übersicht</button><button onclick="document.getElementById('file').click()"><b>＋</b>Neues Dokument</button><button onclick="document.getElementById('reminders').scrollIntoView({behavior:'smooth'})"><b>🔔</b>Erinnerungen</button><button onclick="document.getElementById('installBtn').click()"><b>📱</b>Installieren</button></nav>
 <script type="module" src="app.js"></script>
-<script type="module" src="v17-mode.js"></script>
-<script type="module" src="v18-mode.js"></script>
-<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("sw-v18.js").catch(()=>{});</script>
+<script type="module" src="v19-mode.js"></script>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("sw-v19.js").catch(()=>{});</script>
 </body></html>
