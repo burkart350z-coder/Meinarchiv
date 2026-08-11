@@ -22,4 +22,5 @@
 <nav><button onclick="window.scrollTo({top:0,behavior:'smooth'})"><b>⌂</b>Übersicht</button><button onclick="document.getElementById('file').click()"><b>＋</b>Neues Dokument</button><button onclick="document.getElementById('reminders').scrollIntoView({behavior:'smooth'})"><b>🔔</b>Erinnerungen</button><button onclick="document.getElementById('installBtn').click()"><b>📱</b>Installieren</button></nav>
 <script type="module" src="app.js"></script>
 <script type="module" src="v16-mode.js"></script>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("sw-v16.js").catch(()=>{});</script>
 </body></html>
