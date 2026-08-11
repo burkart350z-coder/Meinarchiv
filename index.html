@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#172033"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png">
-<link rel="stylesheet" href="styles.css"><title>MeinArchiv v16</title>
+<link rel="stylesheet" href="styles.css"><title>MeinArchiv v17</title>
 </head>
 <body>
-<header><h1>📁 MeinArchiv</h1><p>Dein persönliches Dokumenten- & Rechnungsarchiv · v16</p></header>
+<header><h1>📁 MeinArchiv</h1><p>Dein persönliches Dokumenten- & Rechnungsarchiv · v17</p></header>
 <main>
 <div class="card"><div class="stats"><div class="stat"><span class="muted">Offen</span><b id="openCount">0</b></div><div class="stat"><span class="muted">Offener Betrag</span><b id="openAmount">CHF 0.00</b></div><div class="stat"><span class="muted">Bald fällig</span><b id="soonCount">0</b></div></div></div>
 <div class="card"><h2>📚 Archiv</h2><div class="tabs"><button class="tab active" data-filter="open">🔴 Offen</button><button class="tab" data-filter="paid">✅ Erledigt</button><button class="tab" data-filter="all">📚 Alle</button></div></div>
@@ -21,6 +21,6 @@
 </main>
 <nav><button onclick="window.scrollTo({top:0,behavior:'smooth'})"><b>⌂</b>Übersicht</button><button onclick="document.getElementById('file').click()"><b>＋</b>Neues Dokument</button><button onclick="document.getElementById('reminders').scrollIntoView({behavior:'smooth'})"><b>🔔</b>Erinnerungen</button><button onclick="document.getElementById('installBtn').click()"><b>📱</b>Installieren</button></nav>
 <script type="module" src="app.js"></script>
-<script type="module" src="v16-mode.js"></script>
-<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("sw-v16.js").catch(()=>{});</script>
+<script type="module" src="v17-mode.js"></script>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("sw-v17.js").catch(()=>{});</script>
 </body></html>
