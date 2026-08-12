@@ -1,4 +1,4 @@
-// v24: POWERPAY Monatsrechnungen gezielt erkennen.
+// v26: POWERPAY Monatsrechnungen gezielt erkennen.
 // Überschreibt nach der normalen Analyse nur die Felder, die bei POWERPAY eindeutig sind.
 (()=>{
   const file=document.getElementById('file');
@@ -24,8 +24,6 @@
       }
       if(!/(POWERPAY|MF\s+Group\s+AG)/i.test(text)||!/Monatsrechnung/i.test(text))return;
 
-      // POWERPAY: "Letzte Transaktion" enthält alte CHF-Beträge. Diese dürfen nie
-      // als aktueller Rechnungsbetrag verwendet werden. Massgebend ist "Offener Saldo".
       const saldo=text.match(/Offener\s+Saldo\s+(?:CHF\s*)?([0-9' ]+[.,][0-9]{2})/i);
       const minimum=text.match(/Mindestbetrag\s+zahlbar\s+bis\s+\d{1,2}[.\-/]\d{1,2}[.\-/]20\d{2}\s+(?:CHF\s*)?([0-9' ]+[.,][0-9]{2})/i)
         || text.match(/Mindestbetrag[\s\S]{0,80}?(?:CHF\s*)?([0-9' ]+[.,][0-9]{2})/i);
@@ -33,7 +31,6 @@
       const number=text.match(/Monatsrechnung\s+([0-9]{6,20})/i)
         || text.match(/Rechnung:\s*([0-9]{6,20})/i);
 
-      // Kurz warten, damit die normale Analyse fertig ist, dann POWERPAY-Werte priorisieren.
       setTimeout(()=>{
         const amount=document.getElementById('amount');
         const min=document.getElementById('minimum');
@@ -60,4 +57,7 @@
       },700);
     }catch(err){console.error('POWERPAY-Erkennung:',err);}
   },true);
+
+  // Scans ohne eingebetteten PDF-Text zusätzlich per OCR analysieren.
+  import('./scan-ocr.js?v=26').catch(err=>console.error('Scan-OCR konnte nicht geladen werden:',err));
 })();
