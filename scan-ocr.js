@@ -1,4 +1,5 @@
-// v31: Android-OCR stabil + gezielte POWERPAY-Betragserkennung im Seitenfuss.
+// v32: Android-OCR stabil + gezielte POWERPAY-Betragserkennung im Seitenfuss.
+// Wichtig: Nur die POWERPAY-Betragserkennung wurde verfeinert; übrige OCR-/Archiv-Funktionen bleiben unverändert.
 (()=>{
  const file=document.getElementById('file'),$=id=>document.getElementById(id);if(!file)return;
  const moneyVal=s=>{let v=String(s||'').replace(/CHF/gi,'').replace(/'/g,'').trim();v=v.replace(/[^0-9,.-]/g,'');if(!v)return 0;if(v.includes(',')&&v.includes('.'))v=v.lastIndexOf(',')>v.lastIndexOf('.')?v.replace(/\./g,'').replace(',','.'):v.replace(/,/g,'');else if(v.includes(','))v=v.replace(',','.');const n=parseFloat(v);return Number.isFinite(n)?n:0};
@@ -13,23 +14,43 @@
    const p=await pdf.getPage(i),vp=p.getViewport({scale:1.45}),c=document.createElement('canvas');c.width=Math.ceil(vp.width);c.height=Math.ceil(vp.height);
    await p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;out+=await recognizeCanvas(c,`OCR Seite ${i}/${count}`)+'\n';c.width=c.height=1;
   }
-  // POWERPAY druckt Offenen Saldo und Mindestbetrag sehr klein ganz unten auf Seite 1.
-  // Dieser zweite, stark vergrösserte OCR-Pass liest nur den unteren Seitenbereich.
   if(pdf.numPages>=1){
    $('status').textContent='🧠 Beträge werden genauer gelesen …';
-   const p=await pdf.getPage(1),vp=p.getViewport({scale:2.4}),full=document.createElement('canvas');full.width=Math.ceil(vp.width);full.height=Math.ceil(vp.height);
+   const p=await pdf.getPage(1),vp=p.getViewport({scale:2.8}),full=document.createElement('canvas');full.width=Math.ceil(vp.width);full.height=Math.ceil(vp.height);
    await p.render({canvasContext:full.getContext('2d'),viewport:vp}).promise;
+
+   // Bisheriger Seitenfuss-Pass bleibt erhalten.
    const y=Math.floor(full.height*0.68),crop=document.createElement('canvas');crop.width=full.width;crop.height=full.height-y;
    crop.getContext('2d').drawImage(full,0,y,full.width,full.height-y,0,0,crop.width,crop.height);
-   out+='\n'+await recognizeCanvas(crop,'Beträge')+'\n';full.width=full.height=crop.width=crop.height=1;
+   out+='\n'+await recognizeCanvas(crop,'Beträge')+'\n';
+
+   // Zusätzlicher, enger Pass nur über die rechte Betrags-Spalte der POWERPAY-Tabelle.
+   // Dort stehen Offener Saldo, Mindestbetrag und darunter der kleinere Zinsbetrag.
+   const zx=Math.floor(full.width*0.58),zy=Math.floor(full.height*0.76),zw=full.width-zx,zh=Math.floor(full.height*0.20);
+   const zone=document.createElement('canvas');zone.width=zw;zone.height=Math.min(zh,full.height-zy);
+   zone.getContext('2d').drawImage(full,zx,zy,zone.width,zone.height,0,0,zone.width,zone.height);
+   const zoneText=await recognizeCanvas(zone,'POWERPAY Beträge');
+   out+='\n__POWERPAY_NUMERIC_ZONE__\n'+zoneText+'\n__POWERPAY_NUMERIC_ZONE_END__\n';
+   full.width=full.height=crop.width=crop.height=zone.width=zone.height=1;
   }
   return out;
  }
  function isDateLike(raw,start,end){const around=raw.slice(Math.max(0,start-8),Math.min(raw.length,end+8));return /\d{1,2}[.\-/]\d{1,2}[.\-/](?:20)?\d{2}/.test(around)}
  function amountNearLabel(raw,labels,maxChars=180){const lower=raw.toLowerCase();for(const label of labels){let from=0;while(true){const pos=lower.indexOf(label.toLowerCase(),from);if(pos<0)break;const chunk=raw.slice(pos,pos+maxChars);const re=/[0-9]{1,4}(?:[' .][0-9]{3})*[.,][0-9]{2}|[0-9]{1,4}[ ]+[0-9]{2}/g;let m;while((m=re.exec(chunk))){const absStart=pos+m.index,absEnd=absStart+m[0].length;if(isDateLike(raw,absStart,absEnd))continue;const n=moneyVal(m[0]);if(n>0)return n}from=pos+label.length}}return 0}
+ function powerpayZoneAmounts(raw){
+   const m=raw.match(/__POWERPAY_NUMERIC_ZONE__([\s\S]*?)__POWERPAY_NUMERIC_ZONE_END__/);
+   if(!m)return [];
+   const vals=(m[1].match(/\b\d{1,4}[.,]\d{2}\b/g)||[]).map(moneyVal).filter(n=>n>0&&n<100000);
+   return [...new Set(vals.map(n=>n.toFixed(2)))].map(Number).sort((a,b)=>b-a);
+ }
  function fill(text,pages){const raw=String(text||''),t=raw.replace(/\s+/g,' '),pp=/(POWERPAY|MF\s*Group)/i.test(t)&&/(Monatsrechnung|Rechnung)/i.test(t);let total=0,min=0,due='',no='';
   total=amountNearLabel(raw,['Offener Saldo CHF','Offener Saldo','Offener Saido','Offener Sa1do','Offener SaIdo'],120);
   min=amountNearLabel(raw,['Mindestbetrag zahlbar','Mindestbetrag'],140);
+
+  // Nur für POWERPAY-Scans: die zwei grössten Beträge aus der eng zugeschnittenen
+  // Betrags-Spalte sind Saldo und Mindestbetrag. Kleinere Werte (z.B. Zinsankündigung) werden ignoriert.
+  if(pp){const z=powerpayZoneAmounts(raw);if(z.length>=2){total=z[0];min=z[1]}}
+
   let m=t.match(/(?:Zahlbar\s+bis|Fällig\s+am|Fälligkeit)\s*:?[ ]*(\d{1,2})[.\-/](\d{1,2})[.\-/](20\d{2})/i);if(m)due=iso(+m[1],+m[2],+m[3]);
   m=t.match(/Monatsrechnung\s+([0-9]{6,20})/i)||t.match(/Rechnung\s*:?[ ]*([0-9]{6,20})/i);if(m)no=m[1];
   if(pp)$('name').value='POWERPAY / MF Group AG';if(total)$('amount').value=total.toFixed(2);if(min){$('minimum').value=min.toFixed(2);$('minimumWrap').hidden=false}if(due)$('due').value=due;if(no)$('no').value=no;if(pp)$('cat').value='Finanzen';
