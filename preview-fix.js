@@ -1,4 +1,4 @@
-// Isolierte Reparatur: Dokumentvorschau + bezahlte Rechnungen bleiben sichtbar.
+// v22: Isolierte Reparatur für die Dokumentvorschau + bezahlte Rechnungen bleiben sichtbar.
 (()=>{
   const file=document.getElementById('file');
   const button=document.getElementById('documentPreview');
@@ -10,15 +10,15 @@
   let url='';
   const sync=()=>{
     const f=file.files&&file.files[0];
-    button.hidden=!f;
+    button.disabled=!f;
+    button.hidden=false;
     if(!f){if(url){URL.revokeObjectURL(url);url='';}return;}
     if(url)URL.revokeObjectURL(url);
     url=URL.createObjectURL(f);
   };
 
   file.addEventListener('change',sync,true);
-  // Falls app.js den Dateiwert kurz danach verändert, Button trotzdem sichtbar halten.
-  setInterval(()=>{if(file.files&&file.files.length)button.hidden=false;},300);
+  sync();
 
   button.addEventListener('click',e=>{
     e.preventDefault();
@@ -34,8 +34,6 @@
     frame.src='about:blank';
   });
 
-  // Nach "Bezahlt" nicht aus der aktuellen Ansicht verschwinden:
-  // automatisch auf den Bezahlt-Tab wechseln.
   const originalPay=window.pay;
   if(typeof originalPay==='function'){
     window.pay=(i)=>{
@@ -46,9 +44,9 @@
   }else{
     setTimeout(()=>{
       const p=window.pay;
-      if(typeof p==='function'&&!p.__v15fix){
+      if(typeof p==='function'&&!p.__v22fix){
         const wrapped=(i)=>{p(i);document.querySelector('.tab[data-filter="paid"]')?.click()};
-        wrapped.__v15fix=true;window.pay=wrapped;
+        wrapped.__v22fix=true;window.pay=wrapped;
       }
     },1000);
   }
