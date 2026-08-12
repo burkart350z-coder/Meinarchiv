@@ -11,6 +11,7 @@
 <div class="card"><div class="stats"><div class="stat"><span class="muted">Offen</span><b id="openCount">0</b></div><div class="stat"><span class="muted">Offener Betrag</span><b id="openAmount">CHF 0.00</b></div><div class="stat"><span class="muted">Bald fällig</span><b id="soonCount">0</b></div></div></div>
 <div class="card"><h2>💳 Rechnungen</h2><div class="tabs"><button class="tab active" data-filter="open">🔴 Offen</button><button class="tab" data-filter="paid">✅ Bezahlt</button><button class="tab" data-filter="all">📚 Alle</button></div></div>
 <div class="card"><h2>📥 Neue Rechnung</h2><label>PDF oder Bild</label><input id="file" type="file" accept=".pdf,image/*"><div id="scan" class="scan" hidden>🧠 Dokument wird gelesen …</div><div id="status" class="muted">PDF-Text wird gelesen; Bilder werden per OCR analysiert.</div>
+<button class="btn outline wide" id="documentPreview" hidden>👁️ Dokumentvorschau öffnen</button>
 <label>Absender</label><input id="name"><label>Betrag CHF</label><input id="amount" type="number" step=".01" inputmode="decimal">
 <div id="minimumWrap" hidden><label>💳 Mindestbetrag CHF</label><input id="minimum" type="number" step=".01" inputmode="decimal"></div>
 <label>Fällig am</label><input id="due" type="date"><label>Rechnungsnummer</label><input id="no"><label>Kategorie</label><select id="cat"><option>Haushalt</option><option>Fahrzeuge</option><option>Finanzen</option><option>Versicherungen</option><option>Familie</option><option>Verträge</option><option>Bußgelder</option><option>Sonstiges</option></select><label>Erinnerung</label><select id="rem"><option value="7">7 Tage vorher</option><option value="14">14 Tage vorher</option><option value="3">3 Tage vorher</option><option value="1">1 Tag vorher</option><option value="0">Keine Erinnerung</option></select>
@@ -21,4 +22,9 @@
 </main>
 <nav><button onclick="window.scrollTo({top:0,behavior:'smooth'})"><b>⌂</b>Übersicht</button><button onclick="document.getElementById('file').click()"><b>＋</b>Neue Rechnung</button><button onclick="document.getElementById('reminders').scrollIntoView({behavior:'smooth'})"><b>🔔</b>Erinnerungen</button><button onclick="document.getElementById('installBtn').click()"><b>📱</b>Installieren</button></nav>
 <script type="module" src="app.js"></script>
+<script>
+let previewUrl=null;
+const pf=document.getElementById('file'),pb=document.getElementById('documentPreview');
+pf.addEventListener('change',()=>{if(previewUrl)URL.revokeObjectURL(previewUrl);const f=pf.files&&pf.files[0];if(!f){pb.hidden=true;return}previewUrl=URL.createObjectURL(f);pb.hidden=false;pb.onclick=()=>window.open(previewUrl,'_blank');});
+</script>
 </body></html>
